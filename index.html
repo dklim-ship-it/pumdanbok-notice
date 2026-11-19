@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>품·단·복 고지</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20x%3D%2210%22%20y%3D%229%22%20width%3D%2244%22%20height%3D%2252%22%20rx%3D%226%22%20fill%3D%22%23E8590C%22%2F%3E%3Crect%20x%3D%2221%22%20y%3D%223%22%20width%3D%2222%22%20height%3D%2212%22%20rx%3D%224%22%20fill%3D%22white%22%2F%3E%3Crect%20x%3D%2226%22%20y%3D%226%22%20width%3D%2212%22%20height%3D%224%22%20rx%3D%222%22%20fill%3D%22%23E8590C%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2247%22%20font-family%3D%22Arial%22%20font-weight%3D%22700%22%20font-size%3D%2224%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3E%ED%92%88%3C%2Ftext%3E%3C%2Fsvg%3E">
+<style>
+:root{
+  --bg:#f4f5f9; --card:#ffffff; --ink:#1b1d27; --sub:#6b7080; --line:#e4e6ee;
+  --acc:#4f46e5; --acc-ink:#ffffff; --acc-soft:#eef0ff; --ok:#12805c; --ok-soft:#e5f6ef;
+  --warn:#a15c00; --warn-soft:#fff4de; --err:#c62828; --err-soft:#fdeaea;
+  --shadow:0 1px 2px rgba(20,24,40,.05),0 8px 24px rgba(20,24,40,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#12141c;--card:#1b1e29;--ink:#eceef6;--sub:#9aa0b4;--line:#2b2f3f;
+  --acc:#7c85ff;--acc-ink:#0f1020;--acc-soft:#262a45;--ok:#4cd6a0;--ok-soft:#173329;
+  --warn:#ffc260;--warn-soft:#3a2f17;--err:#ff8a8a;--err-soft:#3a1c1c;--shadow:none}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 "Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 24px 60px}
+header{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+header h1{font-size:24px;margin:0;letter-spacing:-.02em}
+header p{margin:0;color:var(--sub)}
+.grid{display:grid;grid-template-columns:minmax(380px,470px) 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.n{width:24px;height:24px;border-radius:50%;background:var(--acc);color:var(--acc-ink);
+  display:inline-grid;place-items:center;font-size:12px;font-weight:700}
+textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);
+  border-radius:10px;padding:11px 12px;outline:none;transition:border-color .15s,box-shadow .15s}
+textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+#notice{height:230px;resize:vertical}
+#apply{height:76px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:var(--acc-soft);color:var(--acc);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600}
+.chip i{font-style:normal;opacity:.6;margin-right:4px}
+.note{margin-top:10px;font-size:13px;border-radius:10px;padding:9px 12px}
+.note.ok{background:var(--ok-soft);color:var(--ok)}
+.note.warn{background:var(--warn-soft);color:var(--warn)}
+.note.err{background:var(--err-soft);color:var(--err)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--bg);padding:4px;border-radius:12px;border:1px solid var(--line)}
+.seg button{border:0;background:transparent;color:var(--sub);font:inherit;font-weight:600;padding:9px 0;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--acc);box-shadow:0 1px 4px rgba(20,24,40,.12)}
+.drop{margin-top:14px;border:2px dashed var(--line);border-radius:12px;padding:20px 14px;text-align:center;color:var(--sub);cursor:pointer;transition:.15s}
+.drop:hover,.drop.over{border-color:var(--acc);background:var(--acc-soft);color:var(--acc)}
+.drop b{display:block;color:var(--ink);margin-bottom:2px}
+.drop.has{border-style:solid;border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.drop.has b{color:var(--ok)}
+.row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.row label.t{font-size:13px;color:var(--sub);min-width:40px}
+.sw{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:14px}
+.sw input{accent-color:var(--acc);width:17px;height:17px}
+.lbl{font-size:13px;color:var(--sub);margin:4px 0 6px}
+.primary{width:100%;border:0;background:var(--acc);color:var(--acc-ink);font:inherit;font-weight:700;font-size:16px;
+  padding:15px;border-radius:14px;cursor:pointer;box-shadow:0 6px 18px rgba(79,70,229,.28);transition:transform .1s,opacity .15s}
+.primary:hover{opacity:.93}.primary:active{transform:scale(.99)}.primary:disabled{opacity:.5;cursor:wait}
+.empty{text-align:center;color:var(--sub);padding:70px 10px}
+.empty .big{font-size:40px;margin-bottom:8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:24px;letter-spacing:-.02em}
+.stat span{font-size:12.5px;color:var(--sub)}
+.bar{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px}
+.bar h3{margin:0;font-size:14px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;font-size:13.5px;
+  padding:8px 14px;border-radius:10px;cursor:pointer;margin-left:6px}
+.btn:hover{border-color:var(--acc);color:var(--acc)}
+.btn.solid{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.solid:hover{color:#fff;opacity:.92}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#msg{height:390px;resize:vertical;white-space:pre-wrap;tab-size:8;line-height:1.6}
+.tbl{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{position:sticky;top:0;background:var(--bg);text-align:left;padding:8px 10px;color:var(--sub);font-weight:600;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid var(--line)}
+td:nth-child(3),td:nth-child(4),td:nth-child(5),th{white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.g{font-weight:700}
+.pill{white-space:nowrap;display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.pill.y{background:var(--ok-soft);color:var(--ok)}.pill.n{background:var(--bg);color:var(--sub);border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#1b1d27;color:#fff;padding:11px 20px;
+  border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:9}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+#netErr{position:sticky;top:0;z-index:99;background:#c62828;color:#fff;text-align:center;font-weight:700;padding:12px 16px}
+</style>
+</head>
+<body>
+<div id="netErr" hidden>⚠ 인터넷 연결 확인 후 새로고침(F5)</div>
+<div class="wrap">
+  <header><h1>품·단·복 고지 자동화</h1><p>공지 붙여넣기 → 파일 올리기 → 멘트와 엑셀 완성</p></header>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2><span class="n">1</span>공지 원문</h2>
+        <textarea id="notice" placeholder="공지 채널의 메시지를 그대로 붙여넣으세요 (Ctrl+V)"></textarea>
+        <div id="parsed"></div>
+      </div>
+      <div class="card">
+        <h2><span class="n">2</span>생성할 플랫폼</h2>
+        <div class="seg" id="seg">
+          <button data-p="NESS" class="on">NESS</button><button data-p="NBOX">NBOX</button><button data-p="숲토어">숲토어</button>
+        </div>
+        <div id="fileBox">
+          <div class="drop" id="drop"><b id="dropTitle">셀러리스트 파일을 끌어다 놓거나 클릭</b><span id="dropSub">.xlsx / .csv</span></div>
+          <input type="file" id="file" accept=".xlsx,.xlsm,.csv" hidden>
+        </div>
+        <div id="soopNote" class="note ok" hidden style="margin-top:14px">숲토어는 파일 없이 멘트만 만듭니다.</div>
+      </div>
+      <div class="card">
+        <h2><span class="n">3</span>옵션</h2>
+        <div class="row">
+          <label class="t">유형</label>
+          <select id="kind" style="max-width:150px">
+            <option value="auto">자동 감지</option><option>단종</option><option>품절</option><option>복귀</option><option>상품명(제조사) 변경</option><option>가격 인상</option><option>가격 인하</option><option>기타</option>
+          </select>
+          <label class="sw" style="margin-left:auto"><input type="checkbox" id="bullet" checked>목록 앞에 * 붙이기</label>
+        </div>
+        <div class="row" id="aiRow" hidden>
+          <label class="sw"><input type="checkbox" id="useAi" checked>🤖 AI로 공지 해석 <small style="color:var(--sub)">(공지 텍스트만 전송, 셀러리스트는 전송 안 함)</small></label>
+        </div>
+        <div class="lbl">※ 안내 문구 <span style="opacity:.7">(공지 해석 결과 · 수정 가능)</span></div>
+        <textarea id="notes" style="height:76px;resize:vertical;margin-bottom:12px"></textarea>
+        <div id="applyWrap">
+          <div class="lbl">적용일 멘트</div>
+          <textarea id="apply"></textarea>
+        </div>
+      </div>
+      <button class="primary" id="go">고지 만들기</button>
+    </div>
+
+    <div class="card" id="result" style="min-height:420px">
+      <div class="empty" id="empty"><div class="big">📦</div>왼쪽에서 공지와 파일을 넣고<br><b>고지 만들기</b>를 누르면 여기에 결과가 나와요.</div>
+      <div id="out" hidden>
+        <div class="stats">
+          <div class="stat"><b id="s1">0</b><span>공지 상품</span></div>
+          <div class="stat"><b id="s2">0</b><span>이 플랫폼 해당 상품</span></div>
+          <div class="stat"><b id="s3">0</b><span>엑셀 행</span></div>
+        </div>
+        <div id="interp" class="note warn" style="font-weight:700;font-size:14px" hidden></div>
+        <div id="warn" class="note warn" hidden></div>
+        <div class="bar"><h3>생성된 멘트 <small style="color:var(--sub);font-weight:400">(직접 수정 가능)</small></h3>
+          <div><button class="btn" id="copy">📋 멘트 복사</button><button class="btn solid" id="dl">⬇ 엑셀 다운로드</button></div>
+        </div>
+        <textarea id="msg"></textarea>
+        <div id="previewWrap">
+          <div class="bar"><h3>엑셀 미리보기</h3></div>
+          <div class="tbl"><table><thead><tr><th>공급제품명</th><th>상품명</th><th>상품번호</th><th>판매가</th><th>공개</th></tr></thead><tbody id="tb"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 외부 라이브러리 로더: cdnjs → jsdelivr → unpkg 순서로 재시도 ===== */
+const LIB_URLS = [
+  'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js',
+  'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js',
+  'https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js'
+];
+let libReady = null;
+function loadLib(){
+  if(window.ExcelJS) return Promise.resolve(true);
+  if(libReady) return libReady;
+  libReady = (async () => {
+    for(const url of LIB_URLS){
+      const ok = await new Promise(res => {
+        const s = document.createElement('script');
+        s.src = url; s.onload = () => res(!!window.ExcelJS); s.onerror = () => { s.remove(); res(false) };
+        document.head.appendChild(s);
+      });
+      if(ok) return true;
+    }
+    document.getElementById('netErr').hidden = false;
+    return false;
+  })();
+  return libReady;
+}
+loadLib();
+
+const $ = s => document.querySelector(s);
+
+/* ===== 공지 해석 (규칙 엔진) ===== */
+const BASE_KINDS = ['단종', '품절', '복귀'];
+const COLOR_CANON = new Map(Object.entries({
+  '빨강':'빨강','빨간':'빨강','빨간색':'빨강','레드':'빨강','red':'빨강',
+  '주황':'주황','주황색':'주황','오렌지':'주황','orange':'주황',
+  '노랑':'노랑','노란':'노랑','노란색':'노랑','옐로우':'노랑','옐로':'노랑','yellow':'노랑',
+  '연두':'연두','연두색':'연두','초록':'초록','초록색':'초록','녹색':'초록','그린':'초록','green':'초록',
+  '하늘':'하늘','하늘색':'하늘','스카이블루':'하늘',
+  '파랑':'파랑','파란':'파랑','파란색':'파랑','블루':'파랑','blue':'파랑','남색':'남색','네이비':'남색',
+  '보라':'보라','보라색':'보라','퍼플':'보라','purple':'보라',
+  '분홍':'분홍','분홍색':'분홍','핑크':'분홍','pink':'분홍',
+  '검정':'검정','검은':'검정','검정색':'검정','검은색':'검정','블랙':'검정','black':'검정',
+  '흰색':'흰색','하양':'흰색','하얀':'흰색','화이트':'흰색','white':'흰색',
+  '회색':'회색','그레이':'회색','grey':'회색','gray':'회색',
+  '갈색':'갈색','브라운':'갈색','베이지':'베이지','민트':'민트','투명':'투명','골드':'골드','실버':'실버'
+}));
+const COLOR_STOP = new Set(['특정','해당','모든','전부','일부','각','상품','상품들','아래','위','기존','신규','이','그','다른']);
+const SKIP_DETAIL = ['셀러리스트', '폐기', '개인정보'];
+const BULLET_RE = /^\s*[*\-•·▪■▶]\s*\S/;
+const TIME_WORDS = /(\d+\s*(분|시간|일)\s*전|어제|오늘|금일|익일|\d+\s*\/\s*\d+|\d+\s*월\s*\d+\s*일)/;
+const CLOCK = /((?:금일|오늘|내일|\d{1,2}\s*월\s*\d{1,2}\s*일)?\s*오[전후]\s*\d{1,2}\s*시(?:\s*\d{1,2}\s*분)?\s*(?:이후|부터|이전|까지)?)/;
+const splitLines = t => t.split(/\r\n|\r|\n/);
+
+function cleanLine(s){
+  s = s.replace(/^[\s*\-•·▪■▶]+/, '').trim();
+  return s.replace(/^\d{1,2}[.)]\s+/, '');
+}
+function parseItemLine(s){
+  s = cleanLine(s);
+  let m = s.match(/^(.+?)\s*(?:->|→|>)\s*(.+?)\s*\/?\s*(?<![\d,])(\d{3,6})$/);
+  if(m) return {name:m[1].trim(), new:m[2].trim(), id:m[3]};
+  m = s.match(/^(\d{3,6})\s*\/\s*(.+)$/);
+  if(m) return {name:m[2].trim(), new:'', id:m[1]};
+  m = s.match(/^(.+?)\s*\/?\s+(\d{3,6})$/);
+  if(m) return {name:m[1].trim(), new:'', id:m[2]};
+  return null;
+}
+function isListHeader(s){
+  return s.includes('상품 리스트') || (s.includes('상품명') && s.includes('ID') && !s.includes('변경') && s.length < 30);
+}
+function isDetailLine(s){
+  s = s.trim();
+  if(!s || SKIP_DETAIL.some(w => s.includes(w)) || parseItemLine(s) || s.startsWith('안녕하세요')) return false;
+  if(/^\[.*\]$/.test(s)) return false;
+  if(BULLET_RE.test(s)) return true;
+  return /[:：>→]|\d\s*원/.test(s) && !/(다|요|죠)[.!]?$/.test(s);
+}
+function fmtDetail(s){
+  let d = s.replace(/^[\s*\-•·▪■▶]+/, '').trim();
+  d = d.replace(/`([^`]*)`/g, '($1)');
+  d = d.replace(/\s*>\s*/g, ' > ');
+  d = d.replace(/(\d[\d,]*원)\s+(\d[\d,]*원\s*(?:인상|인하|할인|증가|감소))(?!\))/g, '$1 ($2)');
+  return d.replace(/\s+/g, ' ');
+}
+function findItems(text){
+  const lines = splitLines(text);
+  const hasHeader = lines.some(l => isListHeader(l.trim()));
+  const items = []; let on = !hasHeader;
+  for(let idx = 0; idx < lines.length; idx++){
+    const s = lines[idx].trim();
+    if(!on){ if(isListHeader(s)) on = true; continue; }
+    if(!s){
+      if(items.length && hasHeader){
+        const nxt = (lines.slice(idx + 1).map(l => l.trim()).find(l => l)) || '';
+        if(!isDetailLine(nxt)) break;
+      }
+      continue;
+    }
+    const p = parseItemLine(s);
+    if(p){ items.push({...p, details:[], raw:[]}); }
+    else if(items.length && isDetailLine(s)){
+      items[items.length - 1].details.push(fmtDetail(s));
+      items[items.length - 1].raw.push(s);
+    }
+    else if(items.length && hasHeader) break;
+  }
+  return items;
+}
+const itemLabel = (it, sep = ' ') => it.new ? `${it.name} > ${it.new} / ${it.id}` : `${it.name}${sep}${it.id}`;
+
+function detectKind(body, items){
+  if(items.some(i => i.new) || /제조사.{0,6}변경|상품명.{0,8}변경|명칭.{0,4}변경/.test(body)){
+    if(body.includes('제조사') && (body.includes('상품명') || body.includes('명칭'))) return '상품명(제조사) 변경';
+    if(body.includes('제조사')) return '제조사 변경';
+    if(body.includes('상품명') || body.includes('명칭')) return '상품명 변경';
+    return '변경';
+  }
+  if(/(가격|판매가|금액).{0,6}(변경|인상|인하|조정)/.test(body)){
+    const up = body.includes('인상'), down = body.includes('인하');
+    return up && !down ? '가격 인상' : (down && !up ? '가격 인하' : '가격 변경');
+  }
+  if(/복귀|재입고|판매\s*재개|재판매/.test(body)) return '복귀';
+  if(body.includes('단종')) return '단종';
+  if(body.includes('품절')) return '품절';
+  return '기타';
+}
+function splitSentences(text, items){
+  const ids = new Set(items.map(i => i.id));
+  const notes = [], applies = [];
+  const skipRaw = new Set(items.flatMap(i => (i.raw || []).map(r => r.trim())));
+  for(let line of splitLines(text)){
+    if(skipRaw.has(line.trim())) continue;
+    const p0 = parseItemLine(line.trim());
+    if(p0 && ids.has(p0.id)) continue;
+    line = line.trim().replace(/\s*\(편집됨\)\s*$/, '');
+    for(let s of line.split(/(?<=[.!?])\s+/)){
+      s = cleanLine(s);
+      if(!s || s.startsWith('안녕하세요') || /^\d{1,2}[.)]$/.test(s) || isListHeader(s)) continue;
+      if(/^\[.*\]$/.test(s) || /^(기존\s*>\s*변경|상품\s*리스트|단종\s*내용)/.test(s)) continue;
+      if(s.includes('셀러리스트') || s.includes('폐기') || s.includes('개인정보')) continue;
+      const p = parseItemLine(s);
+      if(p && ids.has(p.id)) continue;
+      if(/공유\s*드립니다|내용\s*공유|고지\s*부탁|고지\s*요청|공유\s*부탁/.test(s)) continue;
+      if(/말씀\s*부탁|알려\s*주세요|회신|연락\s*부탁/.test(s) && !CLOCK.test(s)) continue;
+      const mc = s.match(CLOCK);
+      if(mc && /변경|적용|처리|인상|인하/.test(s)){
+        const action = /금액|가격|판매가/.test(s) ? '금액 변경' : '변경';
+        const future = /하려고|예정|하겠|진행|할\s*것/.test(s);
+        applies.push(`${mc[1].trim()} ${action} ${future ? '예정입니다.' : '완료되었습니다.'}`);
+        continue;
+      }
+      if(TIME_WORDS.test(s) && /완료|적용|처리|변경|양해/.test(s)){
+        applies.push(s.replace(/된 점 양해 부탁드립니다\.?$/, '되었습니다. 양해 부탁드립니다.'));
+        continue;
+      }
+      notes.push(s);
+    }
+  }
+  return {notes, applies};
+}
+function compose(kind, items, scope = 'all', colors = [], notes = [], applies = []){
+  colors = [...colors]; notes = [...notes]; applies = [...applies];
+  const ctext = colors.join(', ');
+  const price = kind.startsWith('가격');
+  const isChange = kind.endsWith('변경') && !price;
+  const colorOk = BASE_KINDS.includes(kind) && scope === 'color';
+  if(colorOk){
+    notes = colors.length ? [`아래 상품들의 ${ctext} 색상만 ${kind}되었습니다.`] : (notes.length ? [notes[0]] : [`아래 상품들의 특정 색상만 ${kind}되었습니다.`]);
+  }
+  const header = (BASE_KINDS.includes(kind) || price) ? `${kind} 상품명 / ID` : (isChange ? '변경 상품명 / ID' : '상품명 / ID');
+  let excel_note, label, apply_line;
+  if(colorOk){
+    excel_note = colors.length ? `${ctext} 색상만 ${kind} — 해당 상품의 ${ctext} 색상 옵션만 처리 (상품 전체 ${kind} 아님)` : `특정 색상만 ${kind} — 해당 색상 옵션만 처리 (상품 전체 ${kind} 아님)`;
+    label = `🎨 특정 색상 ${kind}` + (colors.length ? ` · ${ctext} 색상만 대상 (상품 전체 ${kind} 아님)` : '');
+    apply_line = `해당 상품의 ${colors.length ? ctext + ' ' : ''}색상 옵션만 ${kind}처리됩니다.`;
+  } else if(price){
+    excel_note = `${kind} 건 — 품목별 변경 내용은 '변경 내용' 열 참고`;
+    label = `💰 ${kind} · 상품 ${items.length}개 (품목별 변경 내용 포함)`;
+    apply_line = '';
+  } else if(isChange){
+    excel_note = `${kind} 건 — '공급제품명' 열의 '기존 > 변경 / ID' 참고`;
+    label = `🔁 ${kind} · 상품 ${items.length}개 (기존 > 변경)`;
+    apply_line = '';
+  } else if(BASE_KINDS.includes(kind)){
+    excel_note = ''; label = `${kind} · 상품 전체`;
+    apply_line = `해당 기종의 옵션만 ${kind}처리됩니다.`;
+  } else {
+    excel_note = ''; label = `📝 ${kind} 공지 · 공지 문장을 안내 문구로 사용`; apply_line = '';
+  }
+  let ness, nbox;
+  if(kind === '단종' || kind === '품절'){
+    ness = '재고가 얼마 없어 어제 먼저 품절 처리해 두었으니 참고 부탁드립니다.\n' + apply_line; nbox = '기적용완료';
+  } else if(kind === '복귀'){
+    ness = '재고가 얼마 없어 어제 먼저 품절 처리해 두었으니 참고 부탁드립니다.\n' + apply_line; nbox = '기적용완료';
+  } else { ness = nbox = applies.join('\n'); }
+  return {kind, items, scope: colorOk ? scope : 'all', colors: colorOk ? colors : [], notes, header, excel_note, label,
+          defaults:{NESS:ness, NBOX:nbox, '숲토어':''}};
+}
+function interpretRules(text, kindOverride = 'auto'){
+  const items = findItems(text);
+  let body = text.includes('[상품 리스트]') ? text.split('[상품 리스트]')[0] : text;
+  const idSet = new Set(items.map(i => i.id));
+  body = splitLines(body.split('***')[0]).filter(l => { const p = parseItemLine(l.trim()); return !(p && idSet.has(p.id)); }).join('\n');
+  const kind = (kindOverride && kindOverride !== 'auto') ? kindOverride : detectKind(body, items);
+  let scope = 'all'; const colors = [];
+  if(BASE_KINDS.includes(kind) && /색상|컬러|color|색만/i.test(body)){
+    scope = 'color';
+    for(const w of (body.match(/[가-힣A-Za-z]+/g) || [])){
+      const c = COLOR_CANON.get(w.toLowerCase());
+      if(c && !colors.includes(c)) colors.push(c);
+    }
+    for(const m of body.matchAll(/([가-힣A-Za-z]{1,10})\s*(?:색상|컬러)/g)){
+      const w = m[1];
+      if(!COLOR_STOP.has(w) && !COLOR_CANON.has(w.toLowerCase()) && !colors.includes(w) && !w.endsWith('의')) colors.push(w);
+    }
+  }
+  const {notes, applies} = splitSentences(text, items);
+  const it = compose(kind, items, scope, colors, notes, applies);
+  it.engine = 'rules';
+  return it;
+}
+const interpret = (text, kind) => interpretRules(text, kind);
+
+/* ===== 셀러리스트 읽기 / 매칭 ===== */
+const norm = s => String(s).replace(/\s+/g, '').toLowerCase();
+function dropBrand(n){
+  const m = String(n).replace(/^\s+/, '').match(/^(\S+)\s+([\s\S]*)$/);
+  return m ? m[2] : String(n);
+}
+function toPrice(v){
+  const t = String(v).replace(/,/g, '').trim();
+  if(t === '' || isNaN(Number(t))) return null;
+  return Number(t);
+}
+function toBool(v){
+  const t = String(v).trim().toLowerCase();
+  if(['true','1','y'].includes(t)) return true;
+  if(['false','0','n'].includes(t)) return false;
+  return v;
+}
+function num(v){
+  const f = Number(String(v).replace(/,/g, ''));
+  if(String(v).trim() === '' || isNaN(f)) return v;
+  return Number.isInteger(f) ? f : f;
+}
+function parseCsv(t){
+  const rows = []; let row = [], f = '', q = false;
+  for(let i = 0; i < t.length; i++){
+    const c = t[i];
+    if(q){
+      if(c === '"'){ if(t[i + 1] === '"'){ f += '"'; i++ } else q = false }
+      else f += c;
+    } else if(c === '"') q = true;
+    else if(c === ','){ row.push(f); f = '' }
+    else if(c === '\n' || c === '\r'){
+      if(c === '\r' && t[i + 1] === '\n') i++;
+      row.push(f); f = ''; rows.push(row); row = [];
+    } else f += c;
+  }
+  if(f !== '' || row.length){ row.push(f); rows.push(row) }
+  return rows;
+}
+function cellStr(v){
+  if(v === null || v === undefined) return '';
+  if(typeof v === 'object'){
+    if(v instanceof Date) return v.toISOString().slice(0, 10);
+    if('result' in v) return cellStr(v.result);
+    if(v.richText) return v.richText.map(r => r.text).join('');
+    if('text' in v) return cellStr(v.text);
+    return '';
+  }
+  return String(v);
+}
+async function readPlatform(filename, buf){
+  const name = filename.toLowerCase();
+  let raw;
+  if(name.endsWith('.csv')){
+    let txt = null;
+    for(const enc of ['utf-8', 'euc-kr']){
+      try{ txt = new TextDecoder(enc, {fatal:true}).decode(buf); break }catch(e){}
+    }
+    if(txt === null) throw new Error('CSV 인코딩을 읽지 못했어요. 엑셀(.xlsx)로 저장해서 올려 주세요.');
+    raw = parseCsv(txt.replace(/^﻿/, ''));
+  } else if(/\.(xlsx|xlsm)$/.test(name)){
+    if(!(await loadLib())) throw new Error('엑셀 처리 라이브러리를 불러오지 못했어요. 인터넷 연결 확인 후 새로고침(F5) 해주세요.');
+    let wb;
+    try{ wb = new ExcelJS.Workbook(); await wb.xlsx.load(buf) }
+    catch(e){ throw new Error('엑셀 파일을 열지 못했어요. 암호가 걸려 있다면 해제한 뒤 올려 주세요.') }
+    const ws = wb.worksheets[0];
+    raw = [];
+    for(let r = 1; r <= ws.rowCount; r++){
+      const row = ws.getRow(r), arr = [];
+      for(let c = 1; c <= ws.columnCount; c++) arr.push(cellStr(row.getCell(c).value));
+      raw.push(arr);
+    }
+  } else throw new Error('지원하지 않는 형식이에요. .xlsx 또는 .csv 파일을 올려 주세요.');
+  const start = raw.findIndex(row => row.some(v => String(v).includes('상품번호')));
+  if(start < 0) throw new Error("'상품번호' 컬럼을 찾지 못했어요. 셀러리스트 파일이 맞는지 확인해 주세요.");
+  const heads = raw[start].map(h => String(h).trim());
+  if(!heads.includes('기본상품')) throw new Error("'기본상품' 컬럼을 찾지 못했어요. 셀러리스트 파일이 맞는지 확인해 주세요.");
+  return raw.slice(start + 1).filter(row => row.some(v => String(v).trim()))
+    .map(row => { const o = {}; heads.forEach((h, i) => { if(i < row.length) o[h] = row[i] }); return o });
+}
+function matchRows(data, items){
+  const out = [], unmatched = [];
+  for(const it of items){
+    const names = [it.name].concat(it.new ? [it.new] : []);
+    const keys = new Set(names.map(norm));
+    const base = r => norm(r['기본상품'] ?? '');
+    let hit = data.filter(r => keys.has(base(r)));
+    if(!hit.length) hit = data.filter(r => base(r).length >= 4 && [...keys].some(k => k.includes(base(r)) || base(r).includes(k)));
+    if(!hit.length && it.new){
+      const keys2 = new Set(names.map(n => norm(dropBrand(n))));
+      hit = data.filter(r => keys2.has(norm(dropBrand(r['기본상품'] ?? ''))));
+    }
+    const label = itemLabel(it);
+    if(!hit.length) unmatched.push(label);
+    for(const r of hit){
+      out.push({
+        item: label,
+        cat: it.name.includes('갤럭시') ? 'Galaxy' : (it.name.includes('아이폰') ? 'iPhone' : '기타'),
+        name: r['디자인 이름'] ?? '',
+        no: String(r['상품번호'] ?? '').split('.')[0],
+        price: toPrice(r['판매가'] ?? ''),
+        open: toBool(r['공개여부'] ?? ''),
+        detail: (it.details || []).join('\n')
+      });
+    }
+  }
+  return {rows: out, unmatched};
+}
+
+/* ===== 고지 엑셀 (기존 고지 파일 양식과 동일) ===== */
+async function buildExcel(rows, platform, note){
+  const FONT = '맑은 고딕';
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet(platform);
+  const fillOf = hex => ({type:'pattern', pattern:'solid', fgColor:{argb:'FF' + hex}});
+  const navy = fillOf('20124D'), purple = fillOf('9900FF'), yellow = fillOf('FFFF00'), grey = fillOf('E7E6E6');
+  const fills = {Galaxy: fillOf('DDEFD0'), iPhone: fillOf('F8CBAD'), '기타': fillOf('DDEBF7')};
+  const side = {style:'thin', color:{argb:'FF000000'}};
+  const box = {left:side, right:side, top:side, bottom:side};
+  const center = {horizontal:'center', vertical:'middle'};
+  const left = {horizontal:'left', vertical:'middle'};
+  const NUM = '#,##0_ ';
+  ws.getRow(1).height = 18;
+  if(note){ const c = ws.getCell(1, 1); c.value = `※ ${note}`; c.font = {name:FONT, size:10, bold:true, color:{argb:'FFC00000'}} }
+  for(const [a, b, text, fill] of [[1,3,'',navy],[4,5,'변경 전',navy],[6,7,'변경 예정',purple],[8,9,'%',purple],[10,10,'공개여부',purple]]){
+    for(let c = a; c <= b; c++) ws.getCell(2, c).fill = fill;
+    const cell = ws.getCell(2, a);
+    if(text) cell.value = text;
+    cell.font = {name:FONT, size:10, bold:true, color:{argb:'FFFFFFFF'}};
+    cell.alignment = center;
+    if(b > a && text) ws.mergeCells(2, a, 2, b);
+  }
+  const heads = ['공급제품명','상품명',`${platform} 상품번호`,'공급가','판매가','공급가','판매가','공급가','판매가','판매상태'];
+  const hasDetail = rows.some(x => x.detail);
+  if(hasDetail) heads.push('변경 내용');
+  heads.forEach((h, i) => {
+    const c = ws.getCell(3, i + 1);
+    c.value = h; c.font = {name:FONT, size:10, bold:true}; c.alignment = center; c.border = box;
+  });
+  const styleRow = (r, cat) => {
+    for(let c = 1; c <= 10; c++){
+      const cell = ws.getCell(r, c);
+      cell.border = box;
+      cell.font = {name:FONT, size: c === 10 ? 11 : 10, bold: c === 1 || c === 2};
+    }
+    for(let c = 1; c <= 3; c++) ws.getCell(r, c).fill = fills[cat];
+    ws.getCell(r, 1).alignment = left; ws.getCell(r, 2).alignment = left; ws.getCell(r, 3).alignment = center;
+    for(const c of [4,5,6,7]) ws.getCell(r, c).numFmt = NUM;
+    ws.getCell(r, 7).fill = grey;
+    ws.getCell(r, 8).numFmt = '0.0%'; ws.getCell(r, 9).numFmt = '0.0%';
+    ws.getCell(r, 10).fill = yellow; ws.getCell(r, 10).alignment = center;
+  };
+  let r = 4;
+  for(const cat of ['Galaxy','iPhone','기타']){
+    const sub = rows.filter(x => x.cat === cat);
+    if(!sub.length) continue;
+    if(cat !== '기타'){ styleRow(r, cat); ws.getCell(r, 1).value = `(${cat})`; r++ }
+    let last = null;
+    for(const x of sub){
+      if(last !== null && x.item !== last){ styleRow(r, cat); r++ }
+      styleRow(r, cat);
+      if(x.item !== last) ws.getCell(r, 1).value = x.item;
+      ws.getCell(r, 2).value = x.name;
+      ws.getCell(r, 3).value = num(x.no);
+      ws.getCell(r, 5).value = x.price;
+      ws.getCell(r, 8).value = {formula: `IF(OR(D${r}="",F${r}=""),"",F${r}/D${r}-1)`};
+      ws.getCell(r, 9).value = {formula: `IF(OR(E${r}="",G${r}=""),"",G${r}/E${r}-1)`};
+      ws.getCell(r, 10).value = x.open;
+      if(hasDetail){
+        const kc = ws.getCell(r, 11);
+        kc.value = x.item !== last ? (x.detail || null) : null;
+        kc.font = {name:FONT, size:10};
+        kc.alignment = {wrapText:true, vertical:'top'};
+        kc.border = box;
+      }
+      last = x.item; r++;
+    }
+    r++;
+  }
+  [40.9, 44.9, 14, 9, 10, 10, 10, 9, 10, 11.1].forEach((w, i) => { ws.getColumn(i + 1).width = w });
+  if(hasDetail) ws.getColumn(11).width = 48;
+  ws.autoFilter = `A3:${hasDetail ? 'K' : 'J'}${Math.max(r - 1, 4)}`;
+  ws.views = [{state:'frozen', xSplit:0, ySplit:3}];
+  return await wb.xlsx.writeBuffer();
+}
+
+/* ===== 멘트 ===== */
+function uniq(rows){
+  const seen = new Set(), out = [];
+  for(const x of rows){
+    const k = JSON.stringify([x.name, x.no, x.cat]);
+    if(!seen.has(k)){ seen.add(k); out.push(x) }
+  }
+  return out;
+}
+function matchedItems(items, rows){
+  const have = new Set(rows.map(x => x.item));
+  return items.filter(i => have.has(itemLabel(i)));
+}
+function headBlock(items, it, bullet, sep = ' '){
+  const b = bullet ? '* ' : '';
+  let top = `${it.header}\n`;
+  if(it.notes.length) top += it.notes.map(n => `※ ${n}\n`).join('') + '\n';
+  const one = i => {
+    let t = `${b}${itemLabel(i, sep)}`;
+    for(const d of (i.details || [])) t += `\n  - ${d}`;
+    return t;
+  };
+  return top + items.map(one).join('\n');
+}
+function what(it){
+  if(it.scope === 'color') return `특정 색상 ${it.kind}`;
+  return it.kind === '기타' ? '관련 공유' : it.kind;
+}
+function introPhrase(it){ const p = what(it); return p.startsWith('상품') ? p : `상품 ${p}`; }
+function nessMsg(items, rows, applyTxt, it, bullet = true){
+  const b = bullet ? '* ' : '';
+  const lines = [];
+  for(const [cat, label] of [['Galaxy','갤럭시'],['iPhone','아이폰'],['기타','']]){
+    const sub = uniq(rows.filter(x => x.cat === cat));
+    if(sub.length){
+      if(label) lines.push(label);
+      sub.forEach(x => lines.push(`${b}${x.name}\t${x.no}`));
+      lines.push('');
+    }
+  }
+  const tail = applyTxt ? `\n\n\n\n마플 / 마플샵 적용일\n${applyTxt}` : '';
+  return `안녕하세요.\n\n${introPhrase(it)} 건이 있어 내용공유드립니다.\n\n\n` +
+    `${headBlock(items, it, bullet)}\n\n\n\n\n` +
+    `NESS 상품명 / 상품번호\n\n` + lines.join('\n').replace(/\s+$/, '') + tail;
+}
+function nboxMsg(items, rows, applyTxt, it, bullet = true){
+  const b = bullet ? '* ' : '';
+  const body = uniq(rows).map(x => `${b}${x.name} / ${x.no}`).join('\n');
+  const tail = applyTxt ? `\n\n\n\n마플/마플샵 적용일\n${applyTxt}` : '';
+  return `${introPhrase(it)} 건이 있어 내용공유드립니다.\n\n\n${headBlock(items, it, bullet)}\n\n\n\n\n` +
+    `NBOX 상품명 / 상품번호\n\n${body}${tail}`;
+}
+function soopMsg(items, it, bullet = true){
+  const kind = it.kind; let first;
+  if(it.scope === 'color'){
+    const c = it.colors.join(', ');
+    first = `하기 상품의 ${c ? c + ' ' : ''}색상이 ${kind}되어 공유드립니다.`;
+  } else if(BASE_KINDS.includes(kind)) first = `하기 상품이 ${kind}되어 공유드립니다.`;
+  else if(kind === '기타') first = '하기 상품 관련 건 공유드립니다.';
+  else first = `하기 상품의 ${kind} 건 공유드립니다.`;
+  return `${first}\n\n\n${headBlock(items, it, bullet, ' / ')}\n\n\n\n\n` +
+    '셀러 리스트 : 파일 참조\n파일은 개인정보가 포함되어 암호 설정하였습니다. 암호는 DM으로 전달드리도록 하겠습니다.';
+}
+
+/* ===== 화면과 연결 (서버 호출 대신 이 페이지 안에서 바로 처리) ===== */
+const DEFAULT_APPLY = {
+  'NESS': '재고가 얼마 없어 어제 먼저 품절 처리해 두었으니 참고 부탁드립니다.\n해당 기종의 옵션만 단종처리됩니다.',
+  'NBOX': '기적용완료',
+  '숲토어': ''
+};
+function apiParse(d){
+  const it = interpret(d.notice || '', d.kind || 'auto');
+  return {ok:true, kind:it.kind, scope:it.scope, colors:it.colors, label:it.label, notes:it.notes, defaults:it.defaults,
+          engine:'rules', ai_error:'',
+          items: it.items.map(i => ({name:i.name, new:i.new || '', id:i.id, details:i.details || []}))};
+}
+async function apiGenerate(d){
+  const p = d.platform || 'NESS';
+  const it = interpret(d.notice || '', d.kind || 'auto');
+  if(d.notes_text !== null && d.notes_text !== undefined)
+    it.notes = splitLines(d.notes_text).map(l => l.trim()).filter(l => l).map(l => l.replace(/^※\s*/, ''));
+  const items = it.items, kind = it.kind, bullet = !!d.bullet;
+  if(!items.length) return {ok:false, error:"공지에서 상품 목록을 찾지 못했어요. 상품 번호(ID)가 적힌 목록(예: '4398 / 상품명' 또는 '기존 > 변경 / 4113')이 있는지 확인해 주세요."};
+  const res = {ok:true, kind, recognized:items.length, platform:p, label:it.label, ai_error:'', rows:[], excluded:[], xlsx:null, xlsx_name:''};
+  if(p === '숲토어'){ res.message = soopMsg(items, it, bullet); res.matched = items.length; return res }
+  if(!d.file_buf) return {ok:false, error:`${p} 셀러리스트 파일을 먼저 올려 주세요.`};
+  let data;
+  try{ data = await readPlatform(d.filename || '', d.file_buf) }catch(e){ return {ok:false, error:e.message} }
+  const {rows, unmatched} = matchRows(data, items);
+  res.excluded = unmatched;
+  if(!rows.length){ res.message = ''; res.matched = 0; res.no_match = true; return res }
+  const mitems = matchedItems(items, rows);
+  res.message = (p === 'NESS' ? nessMsg : nboxMsg)(mitems, rows, (d.apply || '').trim(), it, bullet);
+  res.matched = mitems.length; res.rows = rows;
+  if(await loadLib()){
+    res.xlsx = await buildExcel(rows, p, it.excel_note);
+    const t = new Date(), yy = String(t.getFullYear()).slice(2) + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0');
+    res.xlsx_name = `${p}_상품${kind}고지_${yy}.xlsx`.replace(/\//g, '-');
+  } else res.ai_error = '';
+  return res;
+}
+
+/* ===== 화면 ===== */
+const st = {platform:'NESS', buf:null, fname:'', xlsx:null, xname:'', applyBy:{...DEFAULT_APPLY}, touched:{}, notesTouched:false};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>el.classList.remove('show'),1800)}
+
+/* ----- 1. 공지 실시간 인식 ----- */
+let tm;
+$('#notice').addEventListener('input', () => {st.touched={}; st.notesTouched=false; clearTimeout(tm); tm=setTimeout(parseNotice, 250)});
+function parseNotice(){
+  const t = $('#notice').value, box = $('#parsed');
+  if(!t.trim()){box.innerHTML='';return}
+  const d = apiParse({notice:t, kind:$('#kind').value});
+  if(!d.items.length){box.innerHTML='<div class="note err">상품 목록(ID가 적힌 줄)을 찾지 못했어요. 예: "4398 / 상품명" 또는 "기존 &gt; 변경 / 4113"</div>';return}
+  const cls = d.scope==='color' ? 'warn' : 'ok';
+  box.innerHTML = `<div class="note ${cls}" style="font-weight:700;font-size:14px">${esc(d.label)} <small style="font-weight:400;opacity:.7">· 규칙 해석</small></div>`
+    + '<div class="chips">'+d.items.map(i=>`<span class="chip"><i>${esc(i.id)}</i>${esc(i.name)}${i.new?' → '+esc(i.new):''}${(i.details&&i.details.length)?' · 상세 '+i.details.length+'줄':''}</span>`).join('')+'</div>'
+    + `<div class="note ok">상품 ${d.items.length}개 인식</div>`;
+  for(const p of Object.keys(d.defaults)){ if(!st.touched[p]) st.applyBy[p] = d.defaults[p]; }
+  if(st.platform!=='숲토어' && !st.touched[st.platform]) $('#apply').value = st.applyBy[st.platform] ?? '';
+  if(!st.notesTouched) $('#notes').value = d.notes.join('\n');
+}
+$('#kind').addEventListener('change', ()=>{st.touched={}; st.notesTouched=false; parseNotice()});
+
+/* ----- 2. 플랫폼 / 파일 ----- */
+function setPlatform(p){
+  if(st.inited) st.applyBy[st.platform] = $('#apply').value;
+  st.inited = true;
+  st.platform = p;
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
+  const soop = p==='숲토어';
+  $('#fileBox').hidden = soop; $('#soopNote').hidden = !soop; $('#applyWrap').hidden = soop;
+  $('#apply').value = st.applyBy[p] ?? '';
+}
+document.querySelectorAll('#seg button').forEach(b=>b.addEventListener('click',()=>setPlatform(b.dataset.p)));
+
+const drop=$('#drop'), fileIn=$('#file');
+drop.addEventListener('click',()=>fileIn.click());
+fileIn.addEventListener('change',()=>fileIn.files[0]&&loadFile(fileIn.files[0]));
+['dragenter','dragover'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',ev=>{const f=ev.dataTransfer.files[0]; f&&loadFile(f)});
+function loadFile(f){
+  const rd = new FileReader();
+  rd.onload = () => {
+    st.buf = rd.result; st.fname = f.name;
+    drop.classList.add('has'); $('#dropTitle').textContent = '✓ ' + f.name;
+    $('#dropSub').textContent = (f.size/1024).toFixed(1)+' KB · 클릭해서 다른 파일로 교체';
+  };
+  rd.readAsArrayBuffer(f);
+}
+
+/* ----- 생성 ----- */
+$('#go').addEventListener('click', generate);
+async function generate(){
+  const btn=$('#go'); btn.disabled=true; btn.textContent='만드는 중…';
+  try{
+    const d = await apiGenerate({
+      notice:$('#notice').value, platform:st.platform, kind:$('#kind').value, bullet:$('#bullet').checked,
+      apply:$('#apply').value, notes_text:$('#notes').value, filename:st.fname, file_buf:st.buf});
+    if(!d.ok){ toast(d.error); showError(d.error); return }
+    render(d);
+  }catch(e){ showError('처리 중 오류가 났어요: ' + e.message) }
+  finally{ btn.disabled=false; btn.textContent='고지 만들기' }
+}
+function showError(m){
+  $('#empty').hidden=false; $('#out').hidden=true;
+  $('#empty').innerHTML = `<div class="big">⚠️</div><div class="note err" style="display:inline-block;text-align:left">${esc(m)}</div>`;
+}
+function render(d){
+  $('#empty').hidden=true; $('#out').hidden=false;
+  $('#s1').textContent=d.recognized; $('#s2').textContent=d.matched; $('#s3').textContent=d.rows.length;
+  $('#interp').hidden=!d.label; $('#interp').textContent=d.label||'';
+  const w=$('#warn'), notes=[];
+  if(d.no_match) notes.push('공지 상품이 이 플랫폼 셀러리스트에 하나도 없어요. 이 플랫폼은 고지할 내용이 없을 수 있습니다.');
+  if(d.excluded.length) notes.push('제외(셀러리스트에 없음): '+d.excluded.map(esc).join(', '));
+  w.hidden=!notes.length; w.innerHTML=notes.join('<br>');
+  $('#msg').value = d.message;
+  st.xlsx=d.xlsx; st.xname=d.xlsx_name;
+  $('#dl').disabled=!d.xlsx;
+  $('#previewWrap').hidden = !d.rows.length;
+  let last=null;
+  $('#tb').innerHTML = d.rows.map(r=>{
+    const g = r.item!==last ? `<td class="g">${esc(r.item)}</td>` : '<td></td>'; last=r.item;
+    const open = r.open===true ? '<span class="pill y">공개</span>' : r.open===false ? '<span class="pill n">비공개</span>' : esc(r.open);
+    const price = (r.price==null)?'':Number(r.price).toLocaleString();
+    return `<tr>${g}<td>${esc(r.name)}</td><td>${esc(r.no)}</td><td>${price}</td><td>${open}</td></tr>`;
+  }).join('');
+}
+
+/* ----- 복사 / 다운로드 (브라우저 다운로드로 바로 저장) ----- */
+$('#copy').addEventListener('click', async ()=>{
+  const t=$('#msg').value;
+  try{ await navigator.clipboard.writeText(t) }catch(e){ $('#msg').select(); document.execCommand('copy') }
+  toast('멘트를 복사했어요');
+});
+$('#dl').addEventListener('click', ()=>{
+  if(!st.xlsx) return;
+  const url=URL.createObjectURL(new Blob([st.xlsx],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const a=document.createElement('a'); a.href=url; a.download=st.xname; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000); toast('엑셀을 다운로드했어요');
+});
+
+$('#apply').addEventListener('input',()=>{st.touched[st.platform]=true});
+$('#notes').addEventListener('input',()=>{st.notesTouched=true});
+setPlatform('NESS');
+</script>
+</body>
+</html>
